@@ -1,0 +1,45 @@
+[
+	
+	  { 
+		      "id":"ITEM000001" , 
+		      "product":"Cola",
+		      "quantity":"10",
+		       "price":"4",
+		       "discount" :"1",
+		       "getOneFree":"1"
+
+	 	},
+	 	{ 
+		      "id":"ITEM000003" , 
+		      "product":"Apple",
+		      "quantity":"10",
+		       "price":"5",
+		       "discount" :"0.95",
+		       "getOneFree":"0"
+
+	 	},
+	 	{ 
+		      "id":"ITEM000005" , 
+		      "quantity":"10",
+		       "product":"Pingpong",
+		       "price":"5",
+		       "discount" :"1",
+		       "getOneFree":"2"
+
+	 	},	
+	 	{ 
+		      "id":"ITEM000004" , 
+		      "quantity":"10",
+		       "product":"Chips",
+		       "price":"5",
+		       "discount" :"1",
+		       "getOneFree":"0"
+
+	 	}								     
+		 
+]
+
+
+
+
+		
