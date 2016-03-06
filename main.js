@@ -6,7 +6,8 @@
 var  shoppinglist    =  require('./shoppinglist.json')
 var  productStock    =  require('./database.json')
 
-// 可以进一步重构 把方法封装到放到下面三个对象当中（billListt，receiptList）
+// 可以进一步重构 把方法封装到放到下面三个对象当中（billListt，receiptList， getOneFreelist）
+// 需要进一步重构 增加对参数的校验 以及增加捕捉错误的机制
 var  billList = [ ];
 var  receiptList =[ ];
 var  getOneFreeList = [ ] ;
