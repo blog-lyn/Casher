@@ -7,6 +7,8 @@ var  shoppinglist    =  require('./shoppinglist.json')
 var  productStock    =  require('./database.json')
 
 // 可以进一步重构 把方法封装到放到下面三个对象当中（billListt，receiptList）
+// 需要进一步重构 增加对参数的校验 以及增加捕捉错误的机制
+
 var  billList = [ ];
 var  receiptList =[ ];
 var  getOneFreeList = [ ] ;
@@ -16,7 +18,7 @@ var  savingMount = 0;
 var  inTotal = 0;
 
  
-var step1 = (function getDataReady(err,list) {
+var step1 = (function getDataReady(list) {
 
 	for(let item of list){
 
@@ -38,6 +40,8 @@ var  step2 = (function generateReceipt(data){
 	savingMount =  0;
 	inTotal  =  0;
 	let  line  = {};
+
+
 	console.log('*** Shopping  Receipt ***' );
 	console.log('--------------------------'); 
 
@@ -48,14 +52,9 @@ var  step2 = (function generateReceipt(data){
 
 			console.log(JSON.stringify(getOneFree(ele.product, ele.price,ele.quantity,ele.getOneFree)));
 
-			//line = getOneFree(ele.product, ele.price,ele.quantity,ele.getOneFree);
-			//line = JSON.stringify(ele.product, ele.price,ele.quantity,ele.getOneFree);
 			
-			// console.log( ' Product: %j , Quantity:%j,  Price: %j,  Cost is: %j .' , ele.product , ele.quantity, ele.price, line.Sum);
-
 		} else if (ele.discount != 1){			
-			console.log(JSON.stringify(getDiscount(ele.product, ele.price,ele.quantity, ele.discount)));
-			//console.log( ' Product: %j , Quantity:%j,  Price: %j,  Cost is: %j, Saving %j for you .' , ele.product , ele.quantity, ele.price, line.Sum, line.Saving);
+			console.log(JSON.stringify(getDiscount(ele.product, ele.price,ele.quantity, ele.discount)));			
 
 		} else  {
 
@@ -68,15 +67,15 @@ var  step2 = (function generateReceipt(data){
 				"Price": ele.price, 
 				"Sum":ele.Sum}
 
-			//JSON.stringify(line);
+
 			console.log(JSON.stringify(line));
 
-			//console.log(' Product: %j , Quantity:%j,  Price: %j,  Cost is: %j  . ' , ele.product , ele.quantity, ele.price, ele.Sum);
+	
 
 		}
 
- 
-		}
+	}
+
 
 		if (getOneFreeList.length>1){
 
@@ -102,14 +101,13 @@ var  step2 = (function generateReceipt(data){
 
 function getInfoFromDB(id,Quantity){
 
+		let  found =0 
+
 			for (let  info of productStock) { 
-			//console.log(' item Raw code is:%j, and quantity is %j ',itemID,itemQuantity);
-		      //NewBillItem(info.id, itemQuantity, info.price,info.discount,info.getOneFree);
-			
-			if (id === info.id) {
+				
+				if (id === info.id) {
 
-			//console.log('call NewBillItem');
-
+	
 				let  bill = {
 		      			 'product': info.product , 
 				       'quantity':Quantity,
@@ -118,14 +116,15 @@ function getInfoFromDB(id,Quantity){
 				       'getOneFree':info.getOneFree,
 				       'id':id
 				       }			
-				
+				found =1;
 				return bill;
-				//NewBillItem(bill);
-	 			}
-	 			else{
-	 				return new Error('cannot find item in Database ')
-	 			}
-		 }	
+			
+	 			}	 			 
+		 } 
+		 if (found ===0)
+
+		 return 	new Error('Cannot find item in database')
+
 } 
  
 
@@ -160,8 +159,6 @@ function getOneFree(product,price,quantity,freeQuantity, cb){
 		   
    		 savingMount = savingMount + Saving;
 		 inTotal = Sum +inTotal; 	
-
-		 //console.log( ' Product: %j , Quantity:%j,  Price: %j,  Cost is: %j .' , ele.product , ele.quantity, ele.price, line.Sum);	
 		 
 		 return cb ={ product,quantity,price,Sum};
 
