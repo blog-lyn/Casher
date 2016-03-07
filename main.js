@@ -1,6 +1,3 @@
-//var config = require('./config') ;
-//var fs = require('fs');
-
 "use strict";
 
 var async = require('async');
