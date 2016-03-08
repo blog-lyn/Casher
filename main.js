@@ -5,7 +5,7 @@ var async = require('async');
 var  shoppinglist    =  require('./shoppinglist.json')
 var  productStock    =  require('./database.json')
 
-// 可以进一步重构 把方法封装到放到下面三个对象当中（billListt，receiptList）
+// 可以进一步重构 把方法封装到放到下面三个对象当中（billListt，receiptList, getOneFreelist ）
 // 需要进一步重构 增加对参数的校验 以及增加捕捉错误的机制
 
 var  billList = [ ];
@@ -23,8 +23,26 @@ async.mapSeries(shoppinglist, getDataReady,function(err, results){
 		 console.error(err);
 	}
 	else{
+		generateReceipt(billList);
+	}
+});
 
-		 (function generateReceipt(data){
+//  处理传进来的JSON数据，生成购物车列表
+
+function  getDataReady(item,cb){
+
+	  var   itemID = getAndChecItemId(item);
+	  var   itemQuantity =  getQuantity(item);
+	  var   itemInfo = getInfoFromDB(itemID,itemQuantity);
+
+	  		newBillItem(itemInfo) ; 
+	  		 
+	  			cb();
+	  	 	  		
+ } 
+
+// 生成收据
+function generateReceipt(data){
 
 				savingMount =  0;
 				inTotal  =  0;
@@ -61,37 +79,22 @@ async.mapSeries(shoppinglist, getDataReady,function(err, results){
 
 				}		
 				// 输出账单总额			
-						console.log('--------------------------'); 
-						console.log('Cost in total:', inTotal);
+				
+				console.log('--------------------------'); 
+				console.log('Cost in total:', inTotal);
 
 				//  输出折扣信息
 				if (savingMount != 0){		
 						console.log('Discount in total:', savingMount);
 				}
 
-		})(billList);
-
-	}
-});
-
-//  处理传进来的JSON数据，生成购物车列表
-
-function  getDataReady(item,cb){
-
-	  var   itemID = getAndChecItemId(item);
-	  var   itemQuantity =  getQuantity(item);
-	  var   itemInfo = getInfoFromDB(itemID,itemQuantity);
-
-	  		newBillItem(itemInfo) ; 
-	  		cb();
- } 
+}
 
  
 // 从数据库里检索相应的信息
 function getInfoFromDB(id, Quantity){
 
 		let  found =0 
-
 			for (let  info of productStock) { 
 				
 				if (id === info.id) {
@@ -106,8 +109,7 @@ function getInfoFromDB(id, Quantity){
 				       }			
 				found =1;
 
-				return bill;
-			
+				return bill;			
 	 			}	 			 
 		 	}
 
@@ -126,25 +128,24 @@ function getSum(product,quantity,price,cb){
 		console.log(JSON.stringify(cb));
 }
 
+
 //  输出折扣项目
 function getDiscount(product, price,quantity,discount, cb){
 	
-	let Sum     = price*quantity*discount ;
-	let Saving = price*quantity - Sum ;
+		let Sum     = price*quantity*discount ;
+		let Saving = price*quantity - Sum ;
 
-	 savingMount = savingMount + Saving;
-	 inTotal            = Sum +inTotal;
+		 savingMount = savingMount + Saving;
+		 inTotal            = Sum +inTotal;
 
-	 // return
-	   cb ={ product,quantity,price,Sum,Saving};
-	  console.log(JSON.stringify(cb));
+		 // return
+		   cb ={ product,quantity,price,Sum,Saving};
+		  console.log(JSON.stringify(cb));
  
 }
 //  输出买x送1的项目
 function getOneFree(product,price,quantity,freeQuantity, cb){
-		
-		let   Sum = 0;
-		let   Saving = 0;
+			 
 		let   savingQuant = Math.floor(Number(quantity) /(Number(freeQuantity)+1));
 		let   singleProducts =  Number(quantity) %(Number(freeQuantity)+1);
 		 
@@ -152,8 +153,8 @@ function getOneFree(product,price,quantity,freeQuantity, cb){
 		
 		 getOneFreeList.push(list);
 
-		 Sum = Number(price)*Number(freeQuantity)*savingQuant+ singleProducts*Number(price);
-		 Saving  = quantity*price -Sum;
+		 let Sum = Number(price)*Number(freeQuantity)*savingQuant+ singleProducts*Number(price);
+		 let Saving  = quantity*price -Sum;
 		 
 		   
    		 savingMount = savingMount + Saving;
@@ -178,6 +179,7 @@ function getAndChecItemId(itemCode)  {
 		   		itemCode = itemCode.substr(0,10);
 		   		return itemCode;
 		   } else {
+
 		   		 return new Error('This barcode format is not correct, please check !');
 		   }
 
